@@ -14,12 +14,12 @@
       margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
       color:var(--text); background:var(--bg); line-height:1.45;
     }
-    .wrap{max-width:1100px; margin:40px auto; padding:0 20px;}
+    .wrap{max-width:1200px; margin:40px auto; padding:0 20px;}
     h1{font-size:clamp(1.5rem,2.5vw,2.2rem); margin:0 0 .5rem}
     p.lead{color:var(--muted); margin:.25rem 0 1rem}
-    .tools{display:flex; gap:.75rem; align-items:center; margin:1rem 0}
+    .tools{display:flex; gap:.75rem; align-items:center; margin:1rem 0; flex-wrap:wrap}
     .search{
-      flex:1; min-width:220px; padding:.65rem .85rem; border:1px solid var(--line);
+      flex:1; min-width:260px; padding:.65rem .85rem; border:1px solid var(--line);
       border-radius:12px; background:#fff; outline:none; transition:box-shadow .2s,border-color .2s;
     }
     .search:focus{border-color:var(--brand); box-shadow:0 0 0 3px rgba(79,70,229,.15)}
@@ -31,10 +31,8 @@
     thead th{
       font-weight:600; text-align:left; padding:.9rem .9rem; font-size:.92rem; color:#111827; background:#f3f4f6; border-bottom:1px solid var(--line);
     }
-    tbody td{padding:.8rem .9rem; vertical-align:top; border-bottom:1px solid var(--line)}
-    tbody tr:hover{background:var(--hover)}
-    a.link{color:var(--brand); text-decoration:none; word-break:break-all}
-    a.link:hover{text-decoration:underline}
+    tbody td{padding:.8rem .9rem; vertical-align:top; border-bottom:1px solid var(--line); font-size:.95rem}
+    tbody tr:hover{background:#eef2ff}
     .th-btn{
       background:none; border:none; padding:0; margin:0; font:inherit; color:inherit; cursor:pointer;
       display:inline-flex; align-items:center; gap:.4rem;
@@ -48,27 +46,22 @@
     .sort::after{border-top:6px solid #9ca3af; bottom:1px}
     .asc .sort::before{border-bottom-color:var(--brand)}
     .desc .sort::after{border-top-color:var(--brand)}
-    tfoot td{padding:.7rem .9rem; color:var(--muted); font-size:.9rem}
-    @media (max-width:720px){
-      thead th:nth-child(3), tbody td:nth-child(3){display:block}
-      tbody td:nth-child(2){padding-bottom:.2rem}
-      tbody td:nth-child(3){padding-top:.2rem; color:var(--muted)}
-    }
-    .footer{margin:.75rem 0 0; color:var(--muted); font-size:.85rem}
-    .pill{display:inline-block; padding:.15rem .5rem; border-radius:999px; background:#eef2ff; color:var(--brand-ink); font-size:.78rem}
+    tfoot td{padding:.7rem .9rem; color:#6b7280; font-size:.9rem}
+    a.res{color:#4f46e5; text-decoration:none}
+    a.res:hover{text-decoration:underline}
   </style>
 </head>
 <body>
   <main class="wrap" role="main">
     <header>
       <h1>AD/ADRD Resources Directory</h1>
-      <p class="lead">Quick-reference table of Alzheimer’s disease resources supporting multimodal research (genetics, imaging, biomarkers, clinical cohorts, biospecimens).</p>
+      <p class="lead">Columns: <em>Resource / Cohort</em>, <em>Type</em>, <em>Size</em>, <em>Key Data Types</em>, <em>Highlights</em>. Click a resource name to visit its site.</p>
     </header>
 
     <section class="tools" aria-label="table tools">
-      <input id="search" class="search" type="search" placeholder="Search by name, URL, or data type…" aria-label="Search resources" />
+      <input id="search" class="search" type="search" placeholder="Search across all columns…" aria-label="Search resources" />
       <button class="btn" id="clearBtn" type="button" aria-label="Clear search">Clear</button>
-      <span class="pill" id="countPill">0 items</span>
+      <span id="countPill" style="display:inline-block;padding:.15rem .5rem;border-radius:999px;background:#eef2ff;color:#312e81;font-size:.78rem">0 items</span>
     </section>
 
     <section class="card" aria-label="resources table">
@@ -76,126 +69,84 @@
         <table id="resTable">
           <thead>
             <tr>
-              <th scope="col">
-                <button class="th-btn asc" data-sort="name" aria-label="Sort by resource / cohort">
-                  <span>Resource / Cohort</span><span class="sort" aria-hidden="true"></span>
-                </button>
-              </th>
-              <th scope="col">
-                <button class="th-btn" data-sort="url" aria-label="Sort by website URL">
-                  <span>Website URL</span><span class="sort" aria-hidden="true"></span>
-                </button>
-              </th>
-              <th scope="col">
-                <button class="th-btn" data-sort="types" aria-label="Sort by data type">
-                  <span>Data type</span><span class="sort" aria-hidden="true"></span>
-                </button>
-              </th>
+              <th scope="col"><button class="th-btn asc" data-sort="name"><span>Resource / Cohort</span><span class="sort" aria-hidden="true"></span></button></th>
+              <th scope="col"><button class="th-btn" data-sort="type"><span>Type</span><span class="sort" aria-hidden="true"></span></button></th>
+              <th scope="col"><button class="th-btn" data-sort="size"><span>Size</span><span class="sort" aria-hidden="true"></span></button></th>
+              <th scope="col"><button class="th-btn" data-sort="data"><span>Key Data Types</span><span class="sort" aria-hidden="true"></span></button></th>
+              <th scope="col"><button class="th-btn" data-sort="highlights"><span>Highlights</span><span class="sort" aria-hidden="true"></span></button></th>
             </tr>
           </thead>
-          <tbody id="tbody">
-            <!-- rows injected by JS -->
-          </tbody>
+          <tbody id="tbody"></tbody>
           <tfoot>
-            <tr><td colspan="3">URLs point to official sites where available. Send updates if a link changes.</td></tr>
+            <tr><td colspan="5">Source: uploaded AD resources spreadsheet.</td></tr>
           </tfoot>
         </table>
       </div>
     </section>
 
-    <p class="footer">Tip: Click column headers to sort. Use the search box to filter across all fields.</p>
-  </main>
+    <script>
+      const DATA = [{"name": "AD Knowledge Portal", "type": "Data & tools", "size": "149 studies, 97 institutions", "data": "Omics, phenotypes, translational data", "highlights": "Cross-program translational research hub", "url": "https://adknowledgeportal.synapse.org/"}, {"name": "ADNI", "type": "Data & biorepository", "size": ">3,000 participants", "data": "Imaging, biomarkers, genetics, clinical", "highlights": "Flagship multicenter cohort (since 2004) for NC, MCI, AD", "url": "https://adni.loni.usc.edu/"}, {"name": "ADSP", "type": "Genomics initiative", "size": ">115,000 genomes/exomes", "data": "WGS, WES", "highlights": "Largest AD sequencing effort; rare variant discovery", "url": "https://adsp.niagads.org/"}, {"name": "ADSP Phenotype Harmonization", "type": "Harmonization project", "size": "58,000+ genomes", "data": "Clinical, biomarker, cognitive", "highlights": "Creates standardized phenotype datasets", "url": "https://adsp.niagads.org/"}, {"name": "AIBL", "type": "Longitudinal study", "size": ">1,100 participants", "data": "Imaging, biomarkers, lifestyle, genetics", "highlights": "Early adopter of amyloid PET imaging", "url": "https://aibl.org.au/"}, {"name": "AMP-AD Portal", "type": "Data & tools", "size": "Thousands of samples", "data": "Brain omics (genomics, transcriptomics, proteomics, metabolomics)", "highlights": "Public-private partnership for target discovery", "url": "https://adknowledgeportal.synapse.org/"}, {"name": "BLSA", "type": "Longitudinal study", "size": ">3,200 participants", "data": "Imaging, cognition, pathology, biospecimens", "highlights": "Since 1958; lifespan study of aging", "url": "https://www.blsa.nih.gov/"}, {"name": "CHARGE", "type": "Research consortium", "size": "Tens of thousands", "data": "GWAS, sequencing, cognitive, MRI", "highlights": "Genomics of aging, dementia, stroke", "url": "https://www.chargeconsortium.com/"}, {"name": "CLARITI", "type": "Imaging consortium", "size": "Thousands (ADRC-linked)", "data": "Centralized PET/MRI, clinical, biomarkers", "highlights": "Standardized acquisition & processing", "url": "https://clariti.naccdata.org/"}, {"name": "CPAD", "type": "Data aggregation", "size": "14,500 individuals, 40+ trials", "data": "Clinical trial data, modeling tools", "highlights": "Accelerates drug development, regulatory science", "url": "https://c-path.org/programs/cpad/"}, {"name": "DIAN", "type": "Data & biorepository", "size": ">500 participants", "data": "Imaging, biomarkers, genetics, clinical", "highlights": "Pre-symptomatic tracking of autosomal dominant AD", "url": "https://dian.wustl.edu/"}, {"name": "GAAIN", "type": "Data platform", "size": "-500,000 participants", "data": "Clinical, imaging, genetics, biospecimens", "highlights": "Global federated network for cohort discovery", "url": "https://www.gaain.org/"}, {"name": "GNPC", "type": "Proteomics consortium", "size": "Tens of thousands", "data": "Proteomics (CSF, plasma) + multi-omics", "highlights": "Biomarker discovery & therapeutic targets", "url": "https://www.neuroproteome.org/"}, {"name": "LEADS", "type": "Cohort & repository", "size": "Several hundred (ongoing)", "data": "Imaging, genetics, biomarkers, clinical", "highlights": "Largest early-onset AD cohort", "url": "https://leads-study.medicine.iu.edu/"}, {"name": "NACC", "type": "Data & tools", "size": ">54,000 participants", "data": "Clinical, imaging, neuropathology", "highlights": "Centralized ADRC repository & collaboration hub", "url": "https://naccdata.org/"}, {"name": "NGRAD", "type": "Biorepository", "size": "> 135,000 participants", "data": "DNA, plasma, CSF, stool, fibroblasts, iPSC, brain tissue", "highlights": "Biospecimen bank for ADRC & ADNI", "url": ""}, {"name": "NIAGADS", "type": "Data & research tools", "size": "134 datasets, >180,000 participants", "data": "Genomics, phenotypes, omics, tools", "highlights": "Central hub; includes ADSP 58,507 genomes, ADRGs,", "url": "https://www.niagads.org/"}, {"name": "NIH CARD", "type": "Biorepository & tools", "size": "Varied", "data": "iPSCs, plasmids, code, protocols", "highlights": "Supports tool development & model systems", "url": "https://card.nih.gov/"}, {"name": "OASIS", "type": "Imaging repository", "size": "-700+ subjects across datasets", "data": "MRI, PET, clinical, demographics", "highlights": "Optastes in using", "url": "https://www.oasis-brains.org/"}, {"name": "SCAN", "type": "Standardized dataset", "size": "4,300+ participants", "data": "Harmonized MRI, PET, APOE", "highlights": "ADRC uniform imaging dataset", "url": "https://scan.naccdata.org/"}, {"name": "UK Biobank", "type": "Biobank & platform", "size": ">500,000 participants", "data": "Genetics, imaging, lifestyle, bio samples", "highlights": "Prospective population cohort with dementia sub-studies", "url": "https://www.ukbiobank.ac.uk/"}, {"name": "WHICAP", "type": "Longitudinal study", "size": ">6,800 participants", "data": "Imaging, cognition, genetics, pathology", "highlights": "Diverse, multi-ethnic community cohort", "url": "https://dss.niagads.org/cohorts/washington-heights-and-inwood-community-aging-project-whicap/"}, {"name": "nan", "type": "nan", "size": "nan", "data": "nan", "highlights": "ADNI", "url": ""}];
 
-  <script>
-    const DATA = [
-      { name: "ADNI (Alzheimer’s Disease Neuroimaging Initiative)", url: "https://adni.loni.usc.edu/", types: "Imaging (MRI, PET), biomarkers (CSF), clinical/cognitive, genetics" },
-      { name: "DIAN (Dominantly Inherited Alzheimer Network)", url: "https://dian.wustl.edu/", types: "Clinical/cognitive, imaging, biomarkers, genetics; autosomal-dominant cohorts" },
-      { name: "LEADS (Longitudinal Early-Onset Alzheimer’s Disease Study)", url: "https://leads-study.medicine.iu.edu/", types: "Clinical/cognitive, imaging, biomarkers, genetics; early-onset cohorts" },
-      { name: "AIBL (Australian Imaging, Biomarker & Lifestyle Study)", url: "https://aibl.org.au/", types: "Imaging, clinical/cognitive, blood/CSF biomarkers, genetics, lifestyle" },
-      { name: "BLSA (Baltimore Longitudinal Study of Aging)", url: "https://www.blsa.nih.gov/", types: "Clinical/cognitive, imaging, biomarkers, biospecimens" },
-      { name: "WHICAP (Washington Heights–Inwood Community Aging Project)", url: "https://dss.niagads.org/cohorts/washington-heights-and-inwood-community-aging-project-whicap/", types: "Epidemiology, clinical/cognitive, imaging (MRI/PET), biomarkers, genomics" },
-      { name: "ADSP (Alzheimer’s Disease Sequencing Project)", url: "https://adsp.niagads.org/", types: "Genomics (WES/WGS), functional genomics" },
-      { name: "AMP-AD Knowledge Portal (Agora/ADKP)", url: "https://adknowledgeportal.synapse.org/", types: "Transcriptomics, proteomics, metabolomics, genomics; analysis tools" },
-      { name: "CHARGE (Cohorts for Heart and Aging Research in Genomic Epidemiology)", url: "https://www.chargeconsortium.com/", types: "Genetics/omics meta-analyses, epidemiology" },
-      { name: "GNPC (Global Neurodegeneration Proteomics Consortium)", url: "https://www.neuroproteome.org/", types: "Proteomics (plasma/CSF), clinical; harmonized neurodegeneration proteomes" },
-      { name: "NCRAD (National Centralized Repository for AD/ADRD)", url: "https://ncrad.iu.edu/", types: "Biospecimens: DNA, plasma/serum, CSF, RNA, cell lines, stool, brain tissue" },
-      { name: "NIH CARD (Center for Alzheimer’s & Related Dementias)", url: "https://card.nih.gov/", types: "Data resources, tools, models; intramural research programs" },
-      { name: "NIAGADS (NIA Genetics of Alzheimer’s Disease Data Storage Site)", url: "https://www.niagads.org/", types: "Genomics data repository/portal; ADSP access" },
-      { name: "NACC (National Alzheimer’s Coordinating Center)", url: "https://naccdata.org/", types: "Clinical cohorts (UDS), imaging & CSF subsets; standardized data" },
-      { name: "CPAD (Critical Path for Alzheimer’s Disease)", url: "https://c-path.org/programs/cpad/", types: "Regulatory-grade clinical trial data & tools" },
-      { name: "GAAIN (Global Alzheimer’s Association Interactive Network)", url: "https://www.gaain.org/", types: "Federated clinical/imaging datasets; cohort discovery" },
-      { name: "UK Biobank", url: "https://www.ukbiobank.ac.uk/", types: "Population cohort: imaging, genomics, EHR/registries, biomarkers, lifestyle" },
-      { name: "OASIS (Open Access Series of Imaging Studies)", url: "https://www.oasis-brains.org/", types: "Neuroimaging (MRI/PET), clinical/cognitive; aging & AD datasets" },
-      { name: "SCAN (Standardized Centralized ADRD Neuroimaging)", url: "https://scan.naccdata.org/", types: "Harmonized, QC’ed MRI/PET imaging for AD/ADRD" },
-      { name: "CLARiTI (Consortium for Clarity in ADRD Research)", url: "https://clariti.naccdata.org/", types: "Imaging + plasma + neuropathology integration; ADRC-focused resource" }
-    ];
+      const tbody = document.getElementById("tbody");
+      const search = document.getElementById("search");
+      const clearBtn = document.getElementById("clearBtn");
+      const countPill = document.getElementById("countPill");
+      const headers = Array.from(document.querySelectorAll("thead .th-btn"));
 
-    const tbody = document.getElementById("tbody");
-    const search = document.getElementById("search");
-    const clearBtn = document.getElementById("clearBtn");
-    const countPill = document.getElementById("countPill");
-    const headers = Array.from(document.querySelectorAll("thead .th-btn"));
+      let sortKey = "name";
+      let sortDir = "asc";
+      let query = "";
 
-    let sortKey = "name";
-    let sortDir = "asc";
-    let query = "";
+      function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#39;"); }
 
-    function render() {
-      const q = query.trim().toLowerCase();
-      let rows = DATA.filter(d =>
-        d.name.toLowerCase().includes(q) ||
-        d.url.toLowerCase().includes(q) ||
-        d.types.toLowerCase().includes(q)
-      );
+      function render() {
+        const q = query.trim().toLowerCase();
+        let rows = DATA.filter(d => (
+          (d.name + " " + d.type + " " + d.size + " " + d.data + " " + d.highlights).toLowerCase().includes(q)
+        ));
 
-      rows.sort((a,b) => {
-        const A = (a[sortKey] || "").toLowerCase();
-        const B = (b[sortKey] || "").toLowerCase();
-        if (A < B) return sortDir === "asc" ? -1 : 1;
-        if (A > B) return sortDir === "asc" ? 1 : -1;
-        return 0;
-      });
+        rows.sort((a,b) => {
+          const A = (a[sortKey] || "").toLowerCase();
+          const B = (b[sortKey] || "").toLowerCase();
+          if (A < B) return sortDir === "asc" ? -1 : 1;
+          if (A > B) return sortDir === "asc" ? 1 : -1;
+          return 0;
+        });
 
-      tbody.innerHTML = rows.map(d => `
-        <tr>
-          <td><strong>${escapeHtml(d.name)}</strong></td>
-          <td><a class="link" href="${escapeAttr(d.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(d.url)}</a></td>
-          <td>${escapeHtml(d.types)}</td>
-        </tr>
-      `).join("");
+        tbody.innerHTML = rows.map(d => `
+          <tr>
+            <td>${d.url ? `<a class="res" href="${esc(d.url)}" target="_blank" rel="noopener"><strong>${esc(d.name)}</strong></a>` : `<strong>${esc(d.name)}</strong>`}</td>
+            <td>${esc(d.type)}</td>
+            <td>${esc(d.size)}</td>
+            <td>${esc(d.data)}</td>
+            <td>${esc(d.highlights)}</td>
+          </tr>
+        `).join("");
 
-      countPill.textContent = `${rows.length} item${rows.length!==1?'s':''}`;
-    }
-
-    function escapeHtml(str){
-      return String(str).replace(/[&<>'"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#39;','\"':'&quot;'}[s]));
-    }
-    function escapeAttr(str){ return escapeHtml(str); }
-
-    function setSort(key){
-      if (sortKey === key) {
-        sortDir = sortDir === "asc" ? "desc" : "asc";
-      } else {
-        sortKey = key;
-        sortDir = "asc";
+        countPill.textContent = `${rows.length} item${rows.length!==1?'s':''}`;
       }
+
+      function setSort(key){
+        if (sortKey === key) { sortDir = sortDir === "asc" ? "desc" : "asc"; }
+        else { sortKey = key; sortDir = "asc"; }
+        headers.forEach(h=>{
+          h.classList.toggle("asc", h.dataset.sort===sortKey && sortDir==="asc");
+          h.classList.toggle("desc", h.dataset.sort===sortKey && sortDir==="desc");
+        });
+        render();
+      }
+
+      headers.forEach(h => h.addEventListener("click", () => setSort(h.dataset.sort)));
+      search.addEventListener("input", e => { query = e.target.value; render(); });
+      clearBtn.addEventListener("click", () => { search.value = ""; query = ""; render(); });
+
+      // initial header state + render
       headers.forEach(h=>{
         h.classList.toggle("asc", h.dataset.sort===sortKey && sortDir==="asc");
         h.classList.toggle("desc", h.dataset.sort===sortKey && sortDir==="desc");
       });
       render();
-    }
-
-    headers.forEach(h => h.addEventListener("click", () => setSort(h.dataset.sort)));
-    search.addEventListener("input", e => { query = e.target.value; render(); });
-    clearBtn.addEventListener("click", () => { search.value = ""; query = ""; render(); });
-
-    // initial header state + render
-    headers.forEach(h=>{
-      h.classList.toggle("asc", h.dataset.sort===sortKey && sortDir==="asc");
-      h.classList.toggle("desc", h.dataset.sort===sortKey && sortDir==="desc");
-    });
-    render();
-  </script>
+    </script>
+  </main>
 </body>
 </html>
